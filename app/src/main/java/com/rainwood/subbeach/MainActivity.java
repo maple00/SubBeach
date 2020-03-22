@@ -1,8 +1,5 @@
 package com.rainwood.subbeach;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -14,10 +11,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.rainwood.subbeach.provider.VerifyCodeActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.net.URI;
-import java.security.Permission;
+import com.rainwood.subbeach.looper.LooperPageActivity;
+import com.rainwood.subbeach.looper.SuperLooperPager;
+import com.rainwood.subbeach.provider.VerifyCodeActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,5 +75,21 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PERMISSION_REQUEST_CODE){
             Log.d(TAG , "grantResults --  " + grantResults[0]);
         }
+    }
+
+    /**
+     * 跳转到轮播图界面
+     * @param view
+     */
+    public void tolooperPage(View view){
+        startActivity(new Intent(this, LooperPageActivity.class));
+    }
+
+    /**
+     * 跳转到自定义；轮播图
+     * @param v
+     */
+    public void toCustomViewPager(View v){
+        startActivity(new Intent(this, SuperLooperPager.class));
     }
 }

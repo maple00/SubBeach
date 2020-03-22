@@ -6,6 +6,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
@@ -23,9 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @Author: shearson
+ * @Author: sxs
  * @Time: 2020/3/8 18:06
- * @Desc: java类作用描述
+ * @Desc: 短信内容提供者 --- 获取短信中的验证码
  */
 public class VerifyCodeActivity extends AppCompatActivity {
 
@@ -40,8 +41,25 @@ public class VerifyCodeActivity extends AppCompatActivity {
     private static UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        sUriMatcher.addURI("sms","*", MATCH_CODE);
+        sUriMatcher.addURI("sms", "*", MATCH_CODE);
     }
+
+    /**
+     * verify code count down
+     */
+    private CountDownTimer mCountDownTimer = new CountDownTimer(60 * 1000, 1000) {
+        @SuppressLint("DefaultLocale")
+        @Override
+        public void onTick(long millisUntilFinished) {
+            btGetCode.setText(String.format("%d 可重新获取", millisUntilFinished / 1000));
+            btGetCode.setClickable(false);
+        }
+
+        @Override
+        public void onFinish() {
+            btGetCode.setClickable(true);
+        }
+    };
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -52,33 +70,48 @@ public class VerifyCodeActivity extends AppCompatActivity {
         initEvents();
         // 构建短信观察者
         Uri uri = Uri.parse("content://sms/");
-        getContentResolver().registerContentObserver(uri, true, new ContentObserver(new Handler()) {
-            @Override
-            public void onChange(boolean selfChange, Uri uri) {
-                Log.d(TAG, " uri -- > " + uri);
-                if (sUriMatcher.match(uri) == MATCH_CODE){
-                    Log.d(TAG, " selfChange -- > " + selfChange);
-                    Cursor query = getContentResolver().query(uri, new String[]{"body"}, null, null, null);
-                    if (query.moveToNext()){
-                        String body = query.getString(0);
-                        Log.d(TAG, " body ===== >" + body);
-                        handlerBody(body);
+        getContentResolver().registerContentObserver(uri, true,
+                new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange, Uri uri) {
+                        if (sUriMatcher.match(uri) == MATCH_CODE) {
+                            Log.d(TAG, " selfChange -- > " + selfChange);
+                            Log.d(TAG, " uri -- > " + uri);
+                            Cursor query = getContentResolver().query(uri, new String[]{"message_body"},
+                                    null, null, null);
+                            // 获取短信的column
+                            /*String[] columnNames = query.getColumnNames();
+                            while (query.moveToNext()){
+                                for (String columnName : columnNames) {
+                                    Log.d(TAG, columnName + "  ==== " + query.getString(query.getColumnIndex(columnName)));
+                                }
+                            }*/
+                            if (query.moveToNext()) {
+                                String msg_body = query.getString(0);
+                                Log.d(TAG, " body ===== >" + msg_body);
+                                handlerBody(msg_body);
+                            }
+                            query.close();
+                        }
                     }
-                    query.close();
-                }
-            }
-        });
+                });
 
     }
 
+    /**
+     * 匹配短信验证码
+     *
+     * @param body
+     */
     private void handlerBody(String body) {
-        if (!TextUtils.isEmpty(body) && body.startsWith("【阳光沙滩】")){
+        if (!TextUtils.isEmpty(body) && body.startsWith("【阳光沙滩】")) {
             // 数字正则匹配
             Pattern rex = Pattern.compile("(?<![0-9])([0-9]{4})(?![0-9])");
             Matcher matcher = rex.matcher(body);
             boolean contain = matcher.find();
-            if (contain){
+            if (contain) {
                 Log.d(TAG, "verifyCode ===== > " + matcher.group());
+                etVerifyCode.setText(matcher.group());
             }
         }
     }
@@ -93,7 +126,7 @@ public class VerifyCodeActivity extends AppCompatActivity {
                     return;
                 }
                 // TODO: 向服务器请求验证码到手机
-
+                mCountDownTimer.start();
             }
         });
 

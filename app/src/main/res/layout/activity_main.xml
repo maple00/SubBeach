@@ -19,6 +19,7 @@
 
 
     <Button
+        android:id="@+id/btn_verify_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="跳转到读取短信验证码页面"
@@ -27,5 +28,24 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_get_sms_content" />
 
+    <Button
+        android:id="@+id/btn_to_pager"
+        android:text="跳转到轮播图"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="tolooperPage"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_verify_page"/>
+
+    <Button
+        android:id="@+id/btn_custom_pager"
+        android:text="跳转到自定义轮播图"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="toCustomViewPager"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_to_pager"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

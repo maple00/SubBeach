@@ -24,8 +24,21 @@
             </intent-filter>
         </activity>
 
+        <!--
+        获取短信内的验证码
+        -->
         <activity android:name=".provider.VerifyCodeActivity"/>
-        
+
+        <!--
+        轮播图
+        -->
+        <!-- implements ViewPager-->
+        <activity android:name=".looper.LooperPageActivity"/>
+
+        <!-- custom ViewPager-->
+        <activity android:name=".looper.SuperLooperPager"/>
+
+
     </application>
 
 </manifest>
